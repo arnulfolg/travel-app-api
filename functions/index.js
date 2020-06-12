@@ -1,42 +1,34 @@
 const functions = require('firebase-functions');
-
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-exports.helloWorld = functions.https.onRequest((request, response) => {
- response.send("Hello from Firebase!");
-});
-
-// The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
-
-// The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
+const { HttpsError } = require('firebase-functions/lib/providers/https');
 admin.initializeApp();
 
-exports.addMessage = functions.https.onRequest(async (req, res) => {
-	// Grab the text parameter.
-	const original = req.query.text;
-	console.log(original)
-	// Push the new message into Cloud Firestore using the Firebase Admin SDK.
-	const writeResult = await admin.firestore().collection('messages').add({ original: original });
-	// Send back a message that we've succesfully written the message
-	res.json({ result: `Message with ID: ${writeResult.id} added.` });
+exports.addPlace = functions.https.onRequest(async (req, res) => {
+	if(req.method !== "POST"){
+		throw new functions.https.HttpsError(
+			'unavailable',
+			'Wrong Method'
+		) 
+	}
+	const newPlace = await admin.firestore().collection('places').add({
+		place: req.body.place,
+		description: req.body.description,
+		categories: req.body.categories
+	});
+	res.json({ result: `${req.method} request made with data ${newPlace.id}` });
 });
 
-// Listens for new messages added to /messages/:documentId/original and creates an
-// uppercase version of the message to /messages/:documentId/uppercase
-exports.makeUppercase = functions.firestore.document('/messages/{documentId}')
+exports.updateTags = functions.firestore.document('/places/{documentId}')
 	.onCreate((snap, context) => {
-		// Grab the current value of what was written to Cloud Firestore.
-		const original = snap.data().original;
+		const cats = snap.data().categories;
+		const place = snap.data().place;
+		
+		cats.forEach((element) =>{
+			admin.firestore().collection('tags').add({
+				name: element,
+				places: [context.params.documentId]
+			});
+		})
 
-		// Access the parameter `{documentId}` with `context.params`
-		console.log('Uppercasing', context.params.documentId, original);
-
-		const uppercase = original.toUpperCase();
-
-		// You must return a Promise when performing asynchronous tasks inside a Functions such as
-		// writing to Cloud Firestore.
-		// Setting an 'uppercase' field in Cloud Firestore document returns a Promise.
-		return snap.ref.set({ uppercase }, { merge: true });
+		return true;
 	});
