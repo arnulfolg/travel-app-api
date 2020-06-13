@@ -3,7 +3,7 @@ const {
 	getPlaces,
 	getPlace,
 	updatePlace,
-	updateTags,
+	PlacesTrigger_updateTags,
 } = require('./places');
 
 const {
@@ -20,5 +20,5 @@ module.exports = {
 	'getTag': getTag,
 	'updatePlace': updatePlace,
 	'updateTag': updateTag,
-	'updateTags': updateTags
+	'PlacesTrigger_updateTags': PlacesTrigger_updateTags
 };

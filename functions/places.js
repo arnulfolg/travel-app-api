@@ -101,7 +101,7 @@ const updatePlace = functions.https.onRequest(async (req, res) => {
 });
 
 // Trigger
-const updateTags = functions.firestore.document('/places/{documentId}')
+const PlacesTrigger_updateTags = functions.firestore.document('/places/{documentId}')
 	.onCreate((snap, context) => {
 		const categories = snap.data().categories;
 
@@ -134,5 +134,5 @@ module.exports = {
 	'getPlaces': getPlaces,
 	'getPlace': getPlace,
 	'updatePlace': updatePlace,
-	'updateTags': updateTags
+	'PlacesTrigger_updateTags': PlacesTrigger_updateTags
 };
