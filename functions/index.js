@@ -37,6 +37,28 @@ exports.addPlace = functions.https.onRequest(async (req, res) => {
 
 });
 
+exports.getPlaces = functions.https.onRequest(async (req, res) => {
+	if (req.method !== "GET") {
+		throw new functions.https.HttpsError(
+			'unavailable',
+			'Wrong Method'
+		)
+	}
+
+	await admin.firestore().collection("places")
+		.get()
+		.then(function (docs) {
+			let result = []
+			docs.forEach(function (doc) {
+				result.push(doc.data());
+			});
+			res.json(result);
+		})
+		.catch(function (error) {
+			console.log("Error reading data base: ", error);
+		});
+});
+
 exports.getPlace = functions.https.onRequest(async (req, res) => {
 	if (req.method !== "GET") {
 		throw new functions.https.HttpsError(
@@ -104,6 +126,35 @@ exports.getTag = functions.https.onRequest(async (req, res) => {
 		.catch(function (error) {
 			console.log("Error reading data base: ", error);
 		});
+});
+
+exports.updatePlace = functions.https.onRequest(async (req, res) => {
+	if (req.method !== "PATCH") {
+		throw new functions.https.HttpsError(
+			'unavailable',
+			'Wrong Method'
+		)
+	}
+
+	admin.firestore().collection('places').doc(req.body.id).update({
+		place: req.body.place,
+		description: req.body.description,
+		image: req.body.image
+	});
+
+	res.json({ result: `Place updated` });
+});
+
+exports.updateTag = functions.https.onRequest(async (req, res) => {
+	if (req.method !== "PATCH") {
+		throw new functions.https.HttpsError(
+			'unavailable',
+			'Wrong Method'
+		)
+	}
+
+
+	res.json({ result: `Tag updated` });
 });
 
 exports.updateTags = functions.firestore.document('/places/{documentId}')
