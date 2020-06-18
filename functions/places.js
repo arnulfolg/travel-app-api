@@ -3,6 +3,7 @@ const {
 	HttpsError,
 	increment,
 	firestore,
+	cors,
 } = require('./admin');
 
 const addPlace = functions.https.onRequest(async (req, res) => {
@@ -26,6 +27,7 @@ const addPlace = functions.https.onRequest(async (req, res) => {
 				firestore.collection('places').add({
 					place: req.body.place,
 					description: req.body.description,
+					image: req.body.image,
 					categories: req.body.categories
 				});
 				res.json({ result: `${req.method} request made with data` });
@@ -37,8 +39,9 @@ const addPlace = functions.https.onRequest(async (req, res) => {
 
 });
 
-const getPlaces = functions.https.onRequest(async (req, res) => {
-	if (req.method !== "GET") {
+const getPlaces = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		if (req.method !== "GET") {
 		throw new functions.https.HttpsError(
 			'unavailable',
 			'Wrong Method'
@@ -57,6 +60,8 @@ const getPlaces = functions.https.onRequest(async (req, res) => {
 		.catch(function (error) {
 			console.log("Error reading data base: ", error);
 		});
+	})
+	
 });
 
 const getPlace = functions.https.onRequest(async (req, res) => {

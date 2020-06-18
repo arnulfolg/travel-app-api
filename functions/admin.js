@@ -1,5 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const cors = require('cors')({origin: true});
+
 admin.initializeApp();
 
 const { HttpsError } = require('firebase-functions/lib/providers/https');
@@ -12,5 +14,6 @@ module.exports = {
 	'HttpsError': HttpsError,
 	'increment': increment,
 	'decrement': decrement,
-	'firestore': firestore
+	'firestore': firestore,
+	'cors': cors
 };
