@@ -64,28 +64,56 @@ const getPlaces = functions.https.onRequest((req, res) => {
 	
 });
 
-const getPlace = functions.https.onRequest(async (req, res) => {
-	if (req.method !== "GET") {
+const getFeaturedPlaces = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		if (req.method !== "GET") {
 		throw new functions.https.HttpsError(
 			'unavailable',
 			'Wrong Method'
 		)
 	}
 
-	await firestore.collection("places").where("place", "==", req.body.place)
+	await firestore.collection("places").orderBy("place", "asc").limit(3)
 		.get()
 		.then(function (docs) {
-			let result = {}
+			let result = []
 			docs.forEach(function (doc) {
-				result = doc.data();
-				result["id"] = doc.id
+				result.push(doc.data());
 			});
-
 			res.json(result);
 		})
 		.catch(function (error) {
 			console.log("Error reading data base: ", error);
 		});
+	})
+	
+});
+
+const getPlace = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		if (req.method !== "GET") {
+			throw new functions.https.HttpsError(
+				'unavailable',
+				'Wrong Method'
+			)
+		}
+
+		await firestore.collection("places").where("place", "==", req.query.place)
+			.get()
+			.then(function (docs) {
+				let result = {}
+				docs.forEach(function (doc) {
+					result = doc.data();
+					result["id"] = doc.id
+				});
+
+				res.json(result);
+			})
+			.catch(function (error) {
+				console.log("Error reading data base: ", error);
+			});
+	})
+
 });
 
 const updatePlace = functions.https.onRequest(async (req, res) => {
@@ -137,6 +165,7 @@ const PlacesTrigger_updateTags = functions.firestore.document('/places/{document
 module.exports = {
 	'addPlace': addPlace,
 	'getPlaces': getPlaces,
+	'getFeaturedPlaces': getFeaturedPlaces,
 	'getPlace': getPlace,
 	'updatePlace': updatePlace,
 	'PlacesTrigger_updateTags': PlacesTrigger_updateTags

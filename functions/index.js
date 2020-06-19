@@ -1,6 +1,7 @@
 const {
 	addPlace,
 	getPlaces,
+	getFeaturedPlaces,
 	getPlace,
 	updatePlace,
 	PlacesTrigger_updateTags,
@@ -8,6 +9,7 @@ const {
 
 const {
 	getTags,
+	getTagPlaces,
 	getTag,
 	updateTag,
 } = require('./tags');
@@ -15,8 +17,10 @@ const {
 module.exports = {
 	'addPlace': addPlace,
 	'getPlaces': getPlaces,
+	'getFeaturedPlaces': getFeaturedPlaces,
 	'getPlace': getPlace,
 	'getTags': getTags,
+	'getTagPlaces': getTagPlaces,
 	'getTag': getTag,
 	'updatePlace': updatePlace,
 	'updateTag': updateTag,
