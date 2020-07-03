@@ -1,4 +1,8 @@
 const {
+	createUser,
+} = require('./auth');
+
+const {
 	addPlace,
 	getPlaces,
 	getFeaturedPlaces,
@@ -24,5 +28,6 @@ module.exports = {
 	'getTag': getTag,
 	'updatePlace': updatePlace,
 	'updateTag': updateTag,
-	'PlacesTrigger_updateTags': PlacesTrigger_updateTags
+	'PlacesTrigger_updateTags': PlacesTrigger_updateTags,
+	'createUser' : createUser
 };
