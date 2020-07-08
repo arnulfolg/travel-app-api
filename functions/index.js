@@ -1,5 +1,7 @@
 const {
 	createUser,
+	saveUserPlace,
+	getUserPlace,
 } = require('./auth');
 
 const {
@@ -29,5 +31,7 @@ module.exports = {
 	'updatePlace': updatePlace,
 	'updateTag': updateTag,
 	'PlacesTrigger_updateTags': PlacesTrigger_updateTags,
-	'createUser' : createUser
+	'createUser': createUser,
+	'saveUserPlace': saveUserPlace,
+	'getUserPlace': getUserPlace
 };
