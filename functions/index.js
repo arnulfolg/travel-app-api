@@ -2,6 +2,7 @@ const {
 	createUser,
 	saveUserPlace,
 	getUserPlace,
+	getMyPlaces,
 } = require('./auth');
 
 const {
@@ -33,5 +34,6 @@ module.exports = {
 	'PlacesTrigger_updateTags': PlacesTrigger_updateTags,
 	'createUser': createUser,
 	'saveUserPlace': saveUserPlace,
-	'getUserPlace': getUserPlace
+	'getUserPlace': getUserPlace,
+	'getMyPlaces': getMyPlaces
 };

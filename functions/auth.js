@@ -50,7 +50,7 @@ const getUserPlace = functions.https.onRequest((req, res) => {
 				let result = {}
 				docs.forEach(function (doc) {
 					result = doc.data();
-					result["id"] = doc.id
+					result["docid"] = doc.id
 				});
 
 				res.json(result);
@@ -58,6 +58,49 @@ const getUserPlace = functions.https.onRequest((req, res) => {
 			.catch(function (error) {
 				console.log("Error reading data base: ", error);
 			});
+	})
+
+});
+
+const getMyPlaces = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		if (req.method !== "GET") {
+			throw new functions.https.HttpsError(
+				'unavailable',
+				'Wrong Method'
+			)
+		}
+
+		let userPlaces = []
+		let result = []
+
+		await firestore.collection("users")
+		.where("uid", "==", req.query.uid)
+		.where("wantToVisit", "==", true)
+			.get()
+			.then(function (docs) {
+				docs.forEach(function (doc) { 
+					userPlaces.push(doc.data());
+				});
+
+			})
+			.catch(function (error) {
+				console.log("Error reading data base: ", error);
+			});
+
+		for (let index = 0; index < userPlaces.length; index++) {
+			await firestore.collection("places")
+			.doc(userPlaces[index].pid)
+			.get({source: 'cache'})
+				.then(function (docs) {
+					result.push(docs.data());
+				})
+				.catch(function (error) {
+					console.log("Error reading data base: ", error);
+				});
+		}
+
+		res.json(result);
 	})
 
 });
@@ -72,25 +115,21 @@ const saveUserPlace = functions.https.onRequest((req, res) => {
 			)
 		}
 
-		if(req.body.docid == null){
-			firestore.collection("users")
-			.add({
+		let data = {
 				uid: req.body.uid,
 				pid: req.body.pid,
 				likeStatus: req.body.likeStatus,
-				wantToVisit: req.body.wantToVisit,
-				hadVisited: req.body.hadVisited
-			})
+				wantToVisit: req.body.wantToVisit || false,
+				hadVisited: req.body.hadVisited || false
+			}
+
+		if(req.body.docid == null){
+			firestore.collection("users")
+			.add(data)
 			res.json({ result: `${req.method} request made with data` });
 		}else{
 			firestore.collection("users").doc(req.body.docid)
-			.set({
-				uid: req.body.uid,
-				pid: req.body.pid,
-				likeStatus: req.body.likeStatus,
-				wantToVisit: req.body.wantToVisit,
-				hadVisited: req.body.hadVisited
-			})
+			.set(data)
 			res.json({ result: `${req.method} request made with data` });
 		}
 
@@ -103,5 +142,6 @@ const saveUserPlace = functions.https.onRequest((req, res) => {
 module.exports = {
 	'createUser': createUser,
 	'saveUserPlace': saveUserPlace,
-	'getUserPlace': getUserPlace
+	'getUserPlace': getUserPlace,
+	'getMyPlaces': getMyPlaces
 };
