@@ -1,34 +1,39 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const { HttpsError } = require('firebase-functions/lib/providers/https');
-admin.initializeApp();
+const {
+	createUser,
+	saveUserPlace,
+	getUserPlace,
+	getMyPlaces,
+} = require('./auth');
 
-exports.addPlace = functions.https.onRequest(async (req, res) => {
-	if(req.method !== "POST"){
-		throw new functions.https.HttpsError(
-			'unavailable',
-			'Wrong Method'
-		) 
-	}
-	const newPlace = await admin.firestore().collection('places').add({
-		place: req.body.place,
-		description: req.body.description,
-		categories: req.body.categories
-	});
-	res.json({ result: `${req.method} request made with data ${newPlace.id}` });
-});
+const {
+	addPlace,
+	getPlaces,
+	getFeaturedPlaces,
+	getPlace,
+	updatePlace,
+	PlacesTrigger_updateTags,
+} = require('./places');
 
-exports.updateTags = functions.firestore.document('/places/{documentId}')
-	.onCreate((snap, context) => {
-		const cats = snap.data().categories;
-		const place = snap.data().place;
-		
-		cats.forEach((element) =>{
-			admin.firestore().collection('tags').add({
-				name: element,
-				places: [context.params.documentId]
-			});
-		})
+const {
+	getTags,
+	getTagPlaces,
+	getTag,
+	updateTag,
+} = require('./tags');
 
-		return true;
-	});
+module.exports = {
+	'addPlace': addPlace,
+	'getPlaces': getPlaces,
+	'getFeaturedPlaces': getFeaturedPlaces,
+	'getPlace': getPlace,
+	'getTags': getTags,
+	'getTagPlaces': getTagPlaces,
+	'getTag': getTag,
+	'updatePlace': updatePlace,
+	'updateTag': updateTag,
+	'PlacesTrigger_updateTags': PlacesTrigger_updateTags,
+	'createUser': createUser,
+	'saveUserPlace': saveUserPlace,
+	'getUserPlace': getUserPlace,
+	'getMyPlaces': getMyPlaces
+};
